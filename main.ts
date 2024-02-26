@@ -42,7 +42,7 @@ const suffixBorderArray = (S, bs) => {
 };
 
 const strComp = (S, n, i1, i2) => {
-    eqLen = 0;
+    let eqLen = 0;
     while (i1 < n && i2 < n && (S[i1++] == S[i2++])) {
         ++eqLen;
     }
@@ -75,6 +75,46 @@ const prefixZValues = (S, zp) => {
     return zp;
 }
 
+const BPToBPM = (bp, bpm) => {
+    const N = bp.length;
+    bpm[0] = 0;
+    bpm[N - 1] = bp[N - 1];
+    for (let i = 1; i < N - 1; ++i) {
+        //  Проверка «совпадения следующих символов»
+        if (bp[i] && (bp[i] + 1 == bp[i + 1])) {
+            bpm[i] = bpm[bp[i] - 1];
+        }
+        else {
+            bpm[i] = bp[i];
+        }
+    }
+    return bpm;
+}
+
+const KMP = (P, T) => {
+    let bp = prefixBorderArray(P, []);
+    const M = P.length;
+    const N = T.length;
+    let k = 0;
+    let bpm = BPToBPM(bp, [])
+    console.log(`BP: ${printRes(prefixBorderArray('abcabca', []))}`)
+    // Цикл по символам текста T
+    for (let i = 0; i < N; ++i) {
+        // Быстрые продвижения при фиксированном i
+        while(!!k && P[k] != T[i]) {
+            k = Number(bpm[k - 1]);
+        }
+        // «Честное» сравнение очередной пары символов
+        if(P[k] == T[i]) {
+            ++k;
+        }
+        if (k == M) {
+            console.log(`Вхождение с позиции ${i - k + 1}`);
+            k = bpm[k - 1];
+        }
+    }
+};
+
 const printRes = (result) => {
     let res = '[';
     const N = result.length;
@@ -87,9 +127,14 @@ const printRes = (result) => {
 }
 
 const main = () => {
-    console.log(`prefixBorderArray: ${printRes(prefixBorderArray('abaabab', []))}`);
-//     console.log(`suffixBorderArray: ${printRes(suffixBorderArray('abaabab', []))}`);
-    console.log(`prefixZValues: ${printRes(prefixZValues('AABCAABXAAZ', []))}`);
+    // console.log(`prefixBorderArray: ${printRes(prefixBorderArray('CACZZZCACA', []))}`);
+    // console.log(`suffixBorderArray: ${printRes(suffixBorderArray('abaabab', []))}`);
+    // console.log(`prefixZValues: ${printRes(prefixZValues('AABCAABXAAZ', []))}`);
+    console.log('=============================================== Алгоритм Кнута-Морриса-Пратта ======================================================');
+    KMP('ab', 'abcabca');
+    console.log('------------------------------------------------------------------------------------------------------------------------------------');
+    KMP('игла', 'стогистогстогигстогстогиглстогстогигластогигластог');
+    console.log('====================================================================================================================================');
 };
 
 main();
